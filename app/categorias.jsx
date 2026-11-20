@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import ButtonFlotante from '../components/ButtonFlotante';
@@ -12,7 +12,6 @@ import {
 } from '../components/store';
 
 export default function Categorias() {
-  const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState('');
@@ -28,10 +27,6 @@ export default function Categorias() {
     setTimeout(() => setToast(''), 2200);
   };
 
-  const openProducts = (id) => {
-    router.push({ pathname: '/productos', params: { cat: String(id) } });
-  };
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -41,7 +36,6 @@ export default function Categorias() {
           <CardCategory
             category={item}
             count={countProductsByCategory(item.id)}
-            onPress={() => openProducts(item.id)}
           />
         )}
         ListHeaderComponent={<ViewHead title="Categorías" count={categories.length} />}

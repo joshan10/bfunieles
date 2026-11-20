@@ -1,9 +1,8 @@
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import ButtonFlotante from '../components/ButtonFlotante';
 import CardProduct from '../components/CardProduct';
-import Chips from '../components/Chips';
 import ModalCategoria from '../components/ModalCategoria';
 import ModalProducto from '../components/ModalProducto';
 import SearchBar from '../components/SearchBar';
@@ -12,11 +11,9 @@ import ViewHead from '../components/ViewHead';
 import { getCategories, getProducts } from '../components/store';
 
 export default function Productos() {
-  const params = useLocalSearchParams();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState(0);
   const [showProduct, setShowProduct] = useState(false);
   const [showCategory, setShowCategory] = useState(false);
   const [prodCategoryId, setProdCategoryId] = useState('');
@@ -26,29 +23,16 @@ export default function Productos() {
     useCallback(() => {
       setProducts(getProducts());
       setCategories(getCategories());
-      if (params.cat) {
-        setFilter(Number(params.cat));
-        setSearch('');
-      }
-    }, [params.cat])
-  );
-
-  const chipItems = useMemo(
-    () => [{ id: 0, name: 'Todas' }, ...categories],
-    [categories]
+    }, [])
   );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return products.filter((p) => {
-      const catOk = !filter || p.categoryId === filter;
-      const searchOk = !q || p.name.toLowerCase().includes(q);
-      return catOk && searchOk;
-    });
-  }, [products, search, filter]);
+    return products.filter((p) => !q || p.name.toLowerCase().includes(q));
+  }, [products, search]);
 
   const openProduct = () => {
-    setProdCategoryId(filter ? String(filter) : '');
+    setProdCategoryId('');
     setShowProduct(true);
   };
 
@@ -65,7 +49,6 @@ export default function Productos() {
         onChangeText={setSearch}
         placeholder="Buscar producto..."
       />
-      <Chips items={chipItems} activeId={filter} onSelect={setFilter} />
     </View>
   );
 
@@ -80,8 +63,8 @@ export default function Productos() {
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>Sin productos</Text>
             <Text style={styles.emptySub}>
-              {search || filter
-                ? 'Prueba con otro filtro.'
+              {search
+                ? 'Prueba con otra búsqueda.'
                 : 'Crea el primero con el botón de abajo.'}
             </Text>
           </View>
